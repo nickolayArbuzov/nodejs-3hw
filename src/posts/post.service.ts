@@ -30,7 +30,7 @@ export class PostService {
   }
 
   async findAllByBlogId(id: string) {
-    return await this.postRepository.find({where: {bloggerId: id}})
+    return await this.postRepository.find({where: {blogId: id}})
   }
 
   async createPost(dto: CreatePostDto) {
