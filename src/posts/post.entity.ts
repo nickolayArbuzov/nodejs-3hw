@@ -19,10 +19,10 @@ export class Post {
   createdAt: string;
 
   @Column()
-  bloggerId: string;
+  blogId: string;
 
   @Column()
-  bloggerName: string;
+  blogName: string;
 
   @ManyToOne(() => Blogger, blogger => blogger.posts, {onDelete: 'CASCADE'})
   blogger: Blogger
