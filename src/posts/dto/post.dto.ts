@@ -1,8 +1,8 @@
 import { Transform, TransformFnParams } from "class-transformer";
-import { IsString, Length } from "class-validator";
+import { IsOptional, IsString, IsUUID, Length, Validate } from "class-validator";
+import { BlogIsExistRule, BlogIsExist } from "../../blogger/customValidate";
 
 export class CreatePostDto {
-    
     @Transform(({ value }: TransformFnParams) => value?.trim())
     @IsString()
     @Length(1, 30)
@@ -18,7 +18,14 @@ export class CreatePostDto {
     @Length(1, 1000)
     readonly content: string;
 
-    @IsString()
+    @IsUUID()
+    @Validate(BlogIsExistRule)
+    readonly blogId: string;
+}
+
+export class CratePostDtoWithoutBlogId extends CreatePostDto {
+    @IsOptional()
+    @IsUUID()
     readonly blogId: string;
 }
 
