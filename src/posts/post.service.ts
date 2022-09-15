@@ -24,16 +24,22 @@ export class PostService {
     const all = await repo
       .skip((query.pageNumber ? (+query.pageNumber-1) : (+queryDefault.pageNumber-1)) * (query.pageSize ? + +query.pageSize : +queryDefault.pageSize))
       .take(query.pageSize ? +query.pageSize : +queryDefault.pageSize)
+      .orderBy(`post.${query.sortBy ? query.sortBy : queryDefault.sortBy}`, sortDirection)
       .getMany()
 
     const count = await repo.getCount()
     //TODO: automapper
     //TODO: property order in returned obj's
     const returnedPosts = all.map(a => {
-      return {content: a.content, shortDescription: a.shortDescription, title: a.title, blogId: a.blogId, blogName: a.blogName, id: a.id}
+      return {content: a.content, shortDescription: a.shortDescription, title: a.title, blogId: a.blogId, blogName: a.blogName, createdAt: a.createdAt, id: a.id}
     })
-    return returnedPosts
-    
+    return {
+      pagesCount: Math.ceil(count/(query.pageSize ? + +query.pageSize : +queryDefault.pageSize)), 
+      page: query.pageNumber ? +query.pageNumber : +queryDefault.pageNumber, 
+      pageSize: query.pageSize ? +query.pageSize : +queryDefault.pageSize, 
+      totalCount: count, 
+      items: returnedPosts
+    }
   }
 
   async findAllPostsByBlogId(id: string, query: QueryBlogDto) {
@@ -47,16 +53,22 @@ export class PostService {
       .where({blogId: id})
       .skip((query.pageNumber ? (+query.pageNumber-1) : (+queryDefault.pageNumber-1)) * (query.pageSize ? + +query.pageSize : +queryDefault.pageSize))
       .take(query.pageSize ? +query.pageSize : +queryDefault.pageSize)
+      .orderBy(`post.${query.sortBy ? query.sortBy : queryDefault.sortBy}`, sortDirection)
       .getMany()
 
     const count = await repo.getCount()
     //TODO: automapper
     //TODO: property order in returned obj's
     const returnedPosts = all.map(a => {
-      return {content: a.content, shortDescription: a.shortDescription, title: a.title, blogId: a.blogId, blogName: a.blogName, id: a.id}
+      return {content: a.content, shortDescription: a.shortDescription, title: a.title, blogId: a.blogId, blogName: a.blogName, createdAt: a.createdAt, id: a.id}
     })
-    return returnedPosts
-    
+    return {
+      pagesCount: Math.ceil(count/(query.pageSize ? + +query.pageSize : +queryDefault.pageSize)), 
+      page: query.pageNumber ? +query.pageNumber : +queryDefault.pageNumber, 
+      pageSize: query.pageSize ? +query.pageSize : +queryDefault.pageSize, 
+      totalCount: count, 
+      items: returnedPosts
+    }
   } 
 
   async findOne(id: string) {
@@ -77,6 +89,8 @@ export class PostService {
       newPost.title = dto.title
       newPost.blogId = dto.blogId
       newPost.blogName = donorBlogger.name
+      let date = new Date
+      newPost.createdAt = date.toISOString()
       const post = await this.postRepository.insert(newPost);
       return newPost
     }
@@ -94,6 +108,8 @@ export class PostService {
       newPost.title = dto.title
       newPost.blogId = id
       newPost.blogName = donorBlogger.name
+      let date = new Date
+      newPost.createdAt = date.toISOString()
       const post = await this.postRepository.insert(newPost);
       return newPost
     }
